@@ -3,7 +3,7 @@
 Zhou et al. (2025) introduced a novel output layer for deep neural networks termed the Smooth Monotonic Output Layer (SMOL).
 For illustration, 
 SMOL is integrated into Dynamic-DeepHit (DDH; Lee et al., 2020), 
-resulting in the DDH-SMOL model.
+resulting in DDH-SMOL.
 This Python code provides an implementation of DDH-SMOL, built largely upon the original DDH source code available at https://github.com/chl8856/Dynamic-DeepHit.
 
 ## Environment
