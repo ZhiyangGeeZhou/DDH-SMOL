@@ -9,7 +9,7 @@ This Python code provides an implementation of DDH-SMOL, built largely upon the 
 ## Environment
 Python==2.7.15 tensorflow==1.15.0 numpy==1.16.5 pandas==1.0.1 scikit-learn==0.22.1 lifelines==0.24.9 termcolor==1.1.0 scikit-survival==0.12.0
 
-## Reference
+## References
 C. Lee, J. Yoon and M. van der Schaar (2020). Dynamic-DeepHit: A deep learning approach for dynamic survival analysis with competing risks based on longitudinal data. 
 _IEEE Transactions on Biomedical Engineering_, **67**, 122--133. 
 doi: 10.1109/TBME.2019.2909027. 
