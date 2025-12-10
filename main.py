@@ -14,7 +14,7 @@ import tensorflow as tf
 from class_DeepLongitudinal  import Model_Longitudinal_Attention
 from scipy.interpolate       import BSpline
 from sklearn.model_selection import train_test_split
-from utils_eval              import c_index, brier_score, brier_score_new
+from utils_eval              import c_index
 from utils_helper            import f_get_minibatch
 from utils_log               import save_logging, load_logging
 
@@ -90,8 +90,6 @@ random.seed(seed)
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
-if data_mode == 'CVD':
-    num_Event = 2
 if data_mode == 'ASCVD':
     num_Event = 1
 if data_mode == 'simu':  
@@ -224,54 +222,21 @@ for pars_combn_idx in range(pars_combn_num):
         x_dim_bin               = dim of binary features
         mask1,...,5             = used for loss computation
     '''
+    
+    (x_dim, x_dim_cont, x_dim_bin), (data, label, time, time_last), (mask1, mask2, mask3, mask4, mask5), (data_mi) = impt.import_dataset(
+        network_settings['num_Bspline'], network_settings['degree_Bspline'], 'standard')
 
-    if data_mode == 'ASCVD':
-        (x_dim, x_dim_cont, x_dim_bin), (data, label, time, time_last), (mask1, mask2, mask3, mask4, mask5), (data_mi) = impt.import_dataset_ASCVD(
-            study, network_settings['num_Bspline'], network_settings['degree_Bspline'], 'standard')
-
-        # This must be changed depending on the datasets, prediction/evaliation times of interest
-        if study[2] == 'year':
-            multi = 1
-        elif study[2] == 'month':
-            multi = 12
-        elif study[2] == 'week':
-            multi = 52
-        elif study[2] == 'day':
-            multi = 365
-        pred_time = [5*multi, 10*multi] # prediction time (in year/month/week/day)
-        eval_time = [5*multi, 10*multi] # evaluation time (in year/month/week/day; for C-index and Brier-Score)
-    elif data_mode == 'CVD':
-        (x_dim, x_dim_cont, x_dim_bin), (data, label, time, time_last), (mask1, mask2, mask3, mask4, mask5), (data_mi) = impt.import_dataset_CVD(
-            study, network_settings['num_Bspline'], network_settings['degree_Bspline'], 'standard')
-
-        # This must be changed depending on the datasets, prediction/evaliation times of interest
-        if study[2] == 'year':
-            multi = 1
-        elif study[2] == 'month':
-            multi = 12
-        elif study[2] == 'week':
-            multi = 52
-        elif study[2] == 'day':
-            multi = 365
-        pred_time = [5*multi, 10*multi] # prediction time (in year/month/week/day)
-        eval_time = [5*multi, 10*multi] # evaluation time (in year/month/week/day; for C-index and Brier-Score)
-    elif data_mode == 'simu':
-        (x_dim, x_dim_cont, x_dim_bin), (data, label, time, time_last), (mask1, mask2, mask3, mask4, mask5), (data_mi) = impt.import_dataset_simu(
-            study, scenario, seed, network_settings['num_Bspline'], network_settings['degree_Bspline'], 'standard')
-        
-        # This must be changed depending on the datasets, prediction/evaliation times of interest
-        if study[2] == 'year':
-            multi = 1
-        elif study[2] == 'month':
-            multi = 12
-        elif study[2] == 'week':
-            multi = 52
-        elif study[2] == 'day':
-            multi = 365
-        pred_time = [5*multi, 10*multi] # prediction time (in year/month/week/day)
-        eval_time = [5*multi, 10*multi] # evaluation time (in year/month/week/day; for C-index and Brier-Score)
-    else:
-        print ('ERROR:  DATA_MODE NOT FOUND !!!')
+    # This must be changed depending on the datasets, prediction/evaliation times of interest
+    if study[2] == 'year':
+        multi = 1
+    elif study[2] == 'month':
+        multi = 12
+    elif study[2] == 'week':
+        multi = 52
+    elif study[2] == 'day':
+        multi = 365
+    pred_time = [5*multi, 10*multi] # prediction time (in year/month/week/day)
+    eval_time = [5*multi, 10*multi] # evaluation time (in year/month/week/day; for C-index)
 
     num_Event                   = len(np.unique(label))-1
     T_max                       = float(round(np.max(time) * 1.2))
@@ -406,18 +371,13 @@ for pars_combn_idx in range(pars_combn_num):
                 eval_horizon = int(t_time) + pred_horizon
                 for k in range(num_Event):
                     result1[k, t] = c_index(risk_all[k][:, p, t], te_time, (te_label[:,0] == k+1).astype(int), eval_horizon) #-1 for no event (not comparable)
-                    result2[k, t] = brier_score(risk_all[k][:, p, t], te_time, (te_label[:,0] == k+1).astype(int), eval_horizon) #-1 for no event (not comparable)
     
             if p == 0:
                 final1, final2 = result1, result2
             else:
                 final1, final2 = np.append(final1, result1, axis=0), np.append(final2, result2, axis=0)
 
-
 # ### 4. Printing
-
-# In[ ]:
-
 
 col_header1 = ['Seed']
 for p_time in pred_time:
@@ -435,9 +395,6 @@ for p_time in pred_time:
 df1 = pd.DataFrame(np.append(int(seed), final1.flatten()).reshape([1,len(col_header1)]), columns = col_header1)
 df1_val = pd.DataFrame(np.append(int(seed), val_final1_opt.flatten()).reshape([1,len(col_header1)]), columns = col_header1)
 
-# Brier-score result
-df2 = pd.DataFrame(np.append(int(seed), final2.flatten()).reshape([1,len(col_header2)]), columns = col_header2)
-
 ### PRINTING
 print(pars_combn.iloc[pars_combn_idx_opt]) # CURRENT OPTIMAL HYPERPARAMETERS
 print('========================================================')
@@ -447,9 +404,6 @@ print(df1_val.to_string(index=False))
 print('--------------------------------------------------------')
 print('- C-INDEX-TESTING: ')
 print(df1.to_string(index=False))
-print('--------------------------------------------------------')
-print('- BRIER-SCORE: ')
-print(df2.to_string(index=False))
 print('========================================================')
 
 ### CSV OUTPUT
@@ -467,19 +421,3 @@ else:
         ], axis=1).reset_index(drop=True)
     ])
 df1.to_csv(file_path+'/'+'cindex_'+study[0]+'_'+study[1]+'_'+study[2]+'_DDHSMOL.csv', sep=',', index=False)
-    
-if not os.path.exists(file_path+'/'+'brier_'+study[0]+'_'+study[1]+'_'+study[2]+'_DDHSMOL.csv'):
-    df2 = pd.concat([
-        df2.reset_index(drop=True), 
-        pars_combn.iloc[[pars_combn_idx_opt]].reset_index(drop=True)
-    ], axis=1)
-else:
-    df2 = pd.concat([
-        pd.read_csv(file_path+'/'+'brier_'+study[0]+'_'+study[1]+'_'+study[2]+'_DDHSMOL.csv').reset_index(drop=True), 
-        pd.concat([
-            df2.reset_index(drop=True), 
-            pars_combn.iloc[[pars_combn_idx_opt]].reset_index(drop=True)
-        ], axis=1).reset_index(drop=True)
-    ])
-df2.to_csv(file_path+'/'+'brier_'+study[0]+'_'+study[1]+'_'+study[2]+'_DDHSMOL.csv', sep=',', index=False)
-
