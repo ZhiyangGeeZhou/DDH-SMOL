@@ -123,9 +123,8 @@ new_parser = {'mb_size'          : [32, 64, 128],
               'reg_W_out'        : 0.,
 
               'lambda1'          : [round(pow(10, random.uniform(-1,1)),2) for _ in range(pars_combn_num)],
-              'lambda2'          : [1.],
-              'lambda3'          : [round(pow(10, random.uniform(-3,1)),5) for _ in range(pars_combn_num)],
-              'lambda4'          : [round(pow(10, random.uniform(0,4)),2) for _ in range(pars_combn_num)]
+              'lambda2'          : [round(pow(10, random.uniform(-3,1)),5) for _ in range(pars_combn_num)],
+              'lambda3'          : [round(pow(10, random.uniform(0,4)),2) for _ in range(pars_combn_num)]
 }
 
 for k in range(num_Event):
@@ -159,10 +158,9 @@ pars_tune = ['h_dim_RNN',
              'SOL_active_fn',
              'keep_prob', 
              'lr_train', 
-             'lambda1', 
-             'lambda2', 
-             'lambda3',
-             'lambda4'] + ["_".join([pars_tune_Bspline[i],str(j+1)]) for i in range(len(pars_tune_Bspline)) for j in range(num_Event)]
+             'lambda1',  
+             'lambda2',
+             'lambda3'] + ["_".join([pars_tune_Bspline[i],str(j+1)]) for i in range(len(pars_tune_Bspline)) for j in range(num_Event)]
 
 pars_combn = pd.DataFrame(
     data = np.zeros(shape=(pars_combn_num, len(pars_tune))),
@@ -214,7 +212,6 @@ for pars_combn_idx in range(pars_combn_num):
     lambda1           = float(pars_combn['lambda1'][pars_combn_idx])
     lambda2           = float(pars_combn['lambda2'][pars_combn_idx])
     lambda3           = float(pars_combn['lambda3'][pars_combn_idx])
-    lambda4           = float(pars_combn['lambda4'][pars_combn_idx])
     
     ##### IMPORT DATASET
     ## Users must prepare dataset in csv format and modify 'import_data.py' following our examplar 'PBC2'
@@ -352,7 +349,7 @@ for pars_combn_idx in range(pars_combn_num):
         DATA = (x_mb, k_mb, t_mb, l_mb)
         MASK = (m1_mb, m2_mb, m3_mb, mask4, m5_mb)
         MISSING = (x_mi_mb)
-        PARAMETERS = (lambda1, lambda2, lambda3, lambda4)
+        PARAMETERS = (lambda1, lambda2, lambda3)
 
         _, loss_curr, loss1_curr, loss2_curr, loss3_curr, loss4_curr = model.train(
             DATA, MASK, MISSING, PARAMETERS, keep_prob, lr_train)

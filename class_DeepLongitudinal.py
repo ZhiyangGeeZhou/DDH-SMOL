@@ -72,7 +72,6 @@ class Model_Longitudinal_Attention:
             self.a           = tf.placeholder(tf.float32)
             self.b           = tf.placeholder(tf.float32)
             self.c           = tf.placeholder(tf.float32)
-            self.d           = tf.placeholder(tf.float32)
 
             self.x           = tf.placeholder(tf.float32, shape=[None, self.max_length, self.x_dim])
             self.x_mi        = tf.placeholder(tf.float32, shape=[None, self.max_length, self.x_dim])           #this is the missing indicator (including for cont. & binary) (includes delta)
@@ -226,7 +225,7 @@ class Model_Longitudinal_Attention:
             self.loss_RNN_Prediction()      #get loss3: RNN prediction loss
             self.loss_Smoothness()          #get loss4: Smoothness loss
 
-            self.LOSS_TOTAL     = self.LOSS_1 + self.a*self.LOSS_2 + self.c*self.LOSS_3 + self.d*self.LOSS_4 + tf.losses.get_regularization_loss()
+            self.LOSS_TOTAL     = self.LOSS_1 + self.a*self.LOSS_2 + self.b*self.LOSS_3 + self.c*self.LOSS_4 + tf.losses.get_regularization_loss()
             self.LOSS_BURNIN    = self.LOSS_3 + tf.losses.get_regularization_loss()
 
             self.solver         = tf.train.AdamOptimizer(learning_rate=self.lr_rate).minimize(self.LOSS_TOTAL)
@@ -284,22 +283,22 @@ class Model_Longitudinal_Attention:
         (x_mb, k_mb, t_mb, l_mb)                  = DATA
         (m1_mb, m2_mb, m3_mb, m4, m5_mb)          = MASK
         (x_mi_mb)                                 = MISSING
-        (lambda1, lambda2, lambda3, lambda4)      = PARAMETERS
+        (lambda1, lambda2, lambda3)      = PARAMETERS
         return self.sess.run(self.LOSS_TOTAL, 
                              feed_dict={self.x:x_mb, self.x_mi: x_mi_mb, self.k:k_mb, self.t:t_mb, self.l:l_mb,
                                         self.fc_mask1: m1_mb, self.fc_mask2:m2_mb, self.fc_mask3: m3_mb, self.fc_mask4: m4, self.fc_mask5: m5_mb,
-                                        self.a:lambda1, self.b:lambda2, self.c:lambda3, self.d:lambda4,
+                                        self.a:lambda1, self.b:lambda2, self.c:lambda3,
                                         self.mb_size: np.shape(x_mb)[0], self.keep_prob:keep_prob, self.lr_rate:lr_train})
 
     def train(self, DATA, MASK, MISSING, PARAMETERS, keep_prob, lr_train):
         (x_mb, k_mb, t_mb, l_mb)                  = DATA
         (m1_mb, m2_mb, m3_mb, m4, m5_mb)          = MASK
         (x_mi_mb)                                 = MISSING
-        (lambda1, lambda2, lambda3, lambda4)      = PARAMETERS
+        (lambda1, lambda2, lambda3)      = PARAMETERS
         return self.sess.run([self.solver, self.LOSS_TOTAL, self.LOSS_1, self.LOSS_2, self.LOSS_3, self.LOSS_4], 
                              feed_dict={self.x:x_mb, self.x_mi: x_mi_mb, self.k:k_mb, self.t:t_mb, self.l:l_mb,
                                         self.fc_mask1: m1_mb, self.fc_mask2:m2_mb, self.fc_mask3: m3_mb, self.fc_mask4: m4, self.fc_mask5: m5_mb, 
-                                        self.a:lambda1, self.b:lambda2, self.c:lambda3, self.d:lambda4,
+                                        self.a:lambda1, self.b:lambda2, self.c:lambda3,
                                         self.mb_size: np.shape(x_mb)[0], self.keep_prob:keep_prob, self.lr_rate:lr_train})
     
     def train_burn_in(self, DATA, MISSING, keep_prob, lr_train):
