@@ -128,7 +128,6 @@ def f_construct_dataset(df, feat_list):
         label: event/censoring information
             - 0: censoring
             - 1: event type 1
-            - 2: event type 2
             ...
     '''
 
