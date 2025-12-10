@@ -18,7 +18,6 @@ from utils_eval              import c_index
 from utils_helper            import f_get_minibatch
 from utils_log               import save_logging, load_logging
 
-
 def _f_get_pred(sess, model, data, data_mi, pred_horizon):
     '''
         predictions based on the prediction time.
