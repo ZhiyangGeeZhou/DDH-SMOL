@@ -6,6 +6,11 @@ import numpy as np
 from scipy.interpolate       import BSpline
 from scipy.integrate         import quad
 
+##### USER INPUT
+df_ = pd.read_csv("PATH TO YOUR CSV DATA FILE")
+bin_list = [] # names of binary covariates of interest
+cont_list = [] # names of continuous covariates of interest
+
 ##### USER-DEFINED FUNCTIONS
 def f_get_Normalization(X, norm_mode):    
     num_Patient, num_Feature = np.shape(X)
@@ -152,61 +157,8 @@ def f_construct_dataset(df, feat_list):
     
     return pat_info, data
 
-def import_dataset_ASCVD(study, num_Bspline, degree_Bspline, norm_mode = 'standard'):
-    if isinstance(study, list):
-        df_        = pd.read_csv("PATH TO YOUR CSV DATA FILE")           
-    else:
-        print ('ERROR: ILLEGAL SETUP OF STUDY !!!')
-        
-    bin_list           = [] # names of binary covariates
-    cont_list          = []  # names of continuous covariates
-    feat_list          = cont_list + bin_list
-    df_                = df_[['id', 'tte', 'times', 'label']+feat_list]
-    df_org_            = df_.copy(deep=True)
+def import_dataset(num_Bspline, degree_Bspline, norm_mode = 'standard'):
 
-    df_[cont_list]     = f_get_Normalization(np.asarray(df_[cont_list]).astype(float), norm_mode)
-
-    pat_info, data     = f_construct_dataset(df_, feat_list)
-    _, data_org        = f_construct_dataset(df_org_, feat_list)
-
-    data_mi                  = np.zeros(np.shape(data))
-    data_mi[np.isnan(data)]  = 1
-    data_org[np.isnan(data)] = 0
-    data[np.isnan(data)]     = 0 
-
-    x_dim           = np.shape(data)[2] # 1 + x_dim_cont + x_dim_bin (including delta)
-    x_dim_cont      = len(cont_list)
-    x_dim_bin       = len(bin_list) 
-
-    time_last       = pat_info[:,[3]]  #the last measurement time
-    label           = pat_info[:,[2]]  #competing risks
-    time            = pat_info[:,[1]]  #age when event occurred
-    T_max           = float(round(np.max(time) * 1.2)) # right boundry of time interval
-    
-    num_Event       = len(np.unique(label)) - 1
-    
-    for k, tmp_label in enumerate(np.unique(label)):
-        label[np.where(label == tmp_label)] = k # relabel risks by 0,...,num_Event
-
-    mask1, mask2    = f_get_fc_mask12(time, num_Event, num_Bspline, degree_Bspline, T_max)
-    mask3           = f_get_fc_mask3(time_last, num_Event, num_Bspline, degree_Bspline, T_max)
-    mask4           = f_get_fc_mask4(num_Event, num_Bspline, degree_Bspline, T_max)
-    mask5           = f_get_fc_mask5(label)
-
-    DIM             = (x_dim, x_dim_cont, x_dim_bin)
-    DATA            = (data, label, time, time_last)
-    MASK            = (mask1, mask2, mask3, mask4, mask5)
-
-    return DIM, DATA, MASK, data_mi
-    
-def import_dataset_simu(study, scenario, seed, num_Bspline, degree_Bspline, norm_mode = 'standard'):
-    if isinstance(study, list):
-        df_        = pd.read_csv("PATH TO YOUR CSV DATA FILE")
-    else:
-        print ('ERROR: ILLEGAL SETUP OF STUDY !!!')
-        
-    bin_list           = [] # names of binary covariates
-    cont_list          = [] # names of continuous covariates
     feat_list          = cont_list + bin_list
     df_                = df_[['id', 'tte', 'times', 'label']+feat_list]
     df_org_            = df_.copy(deep=True)
