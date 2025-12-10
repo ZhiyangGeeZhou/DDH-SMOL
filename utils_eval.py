@@ -38,22 +38,3 @@ def c_index(Prediction, Time_survival, Death, Time):
         result = float(Num/Den)
 
     return result
-
-### BRIER-SCORE
-def brier_score(Prediction, Time_survival, Death, Time):
-    N = len(Prediction)
-    y_true = ((Time_survival <= Time) * Death).astype(float)
-    
-    N = len(Prediction)
-    ind1 = ((Time_survival < Time).reshape([N,]) * Death == 1)
-    ind2 = (Time_survival < Time).reshape([N,])
-    ind3 = ((Time_survival < Time).reshape([N,]) * Death == 0)
-
-    events = np.nansum((Prediction - ind1)**2)
-    no_events = np.nansum(Prediction[ind2]**2)
-    censored = 0
-    if any(ind3):
-        weights = Prediction[ind3]
-        censored = np.nansum(weights * ((1 - Prediction[ind3])**2) + (1 - weights) * (Prediction[ind3]**2))
-
-    return (events + no_events + censored)/N
