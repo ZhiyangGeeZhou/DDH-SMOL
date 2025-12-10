@@ -24,7 +24,6 @@ def create_rnn_cell(num_units, num_layers, keep_prob, RNN_type, activation_fn):
             cell = tf.contrib.rnn.GRUCell(num_units, activation=activation_fn)
         elif RNN_type == 'LSTM':
             cell = tf.contrib.rnn.LSTMCell(num_units, activation=activation_fn, state_is_tuple=True)
-            # cell = tf.contrib.rnn.LSTMCell(num_units, activation=activation_fn)
         if not keep_prob is None:
             cell = tf.contrib.rnn.DropoutWrapper(cell, input_keep_prob=keep_prob, output_keep_prob=keep_prob) # state_keep_prob=keep_prob
         cells.append(cell)
