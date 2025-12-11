@@ -19,5 +19,5 @@ Lee, C., Yoon, J., & Van Der Schaar, M. (2020).
 Dynamic-deephit: A deep learning approach for dynamic survival analysis with competing risks based on longitudinal data. _IEEE Transactions on Biomedical Engineering_, 67, 122-133.
 [doi:10.1109/TBME.2019.2909027](https://dx.doi.org/10.1109/TBME.2019.2909027)
 
-**Zhou, Z.**, Deng, Y.,  (2025).
+**Zhou, Z.**, Deng, Y., Liu, L., Jiang, H., Peng, Y., Yang, X., Zhao, Y., Ning, H., Allen, N., Wilkins, J., Liu, K., Lloyd-Jones, D., and Zhao, L. (2025).
 Deep neural network with a smooth monotonic output layer for dynamic risk prediction. 
