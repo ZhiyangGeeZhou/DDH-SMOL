@@ -1,4 +1,4 @@
-# Python code for DDH-SMOL
+# Smooth Monotonic Output Layer
 ## Description
 Zhou et al. (2025) introduced a novel output layer for deep neural networks termed the Smooth Monotonic Output Layer (SMOL).
 For illustration, 
