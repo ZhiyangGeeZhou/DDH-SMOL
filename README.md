@@ -15,5 +15,5 @@ This Python code provides an implementation of DDH-SMOL, built largely upon the 
 Python==2.7.15 tensorflow==1.15.0 numpy==1.16.5 pandas==1.0.1 scikit-learn==0.22.1 lifelines==0.24.9 termcolor==1.1.0 scikit-survival==0.12.0
 
 ## Reference
-Zhou, Z., Deng, Y., Liu, L., Jiang, H., Peng, Y., Yang, X., Zhao, Y., Ning, H., Allen, N., Wilkins, J., Liu, K., Lloyd-Jones, D., & Zhao, L. (2025).
+Zhou, Z., Deng, Y., Liu, L., Jiang, H., Peng, Y., Yang, X., Zhao, Y., Ning, H., Allen, N., Wilkins, J., Liu, K., Lloyd-Jones, D., & Zhao, L. (2026).
 Deep neural network with a smooth monotonic output layer for dynamic risk prediction. Accepted by _Statistics in Medicine_.
